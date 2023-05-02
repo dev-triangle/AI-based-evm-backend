@@ -80,8 +80,12 @@ WSGI_APPLICATION = 'ai_based_evm_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'adhinandualensanosh',
+        'HOST': 'db.uxbncpdtfhnukbpkovwx.supabase.co',
+        'PORT': '5432'
     }
 }
 
