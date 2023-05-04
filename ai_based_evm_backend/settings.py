@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,8 +25,8 @@ SECRET_KEY = 'django-insecure-_5c(ciaq)=9hq+nflhx6fglats+mw(t!p2v4yn$m!l$$j+dl9c
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS=['*']
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 # Application definition
@@ -52,7 +53,30 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+
 ]
+REST_FRAMEWORK={
+    'DEFAULT_PERMISSION_CLASSES':('rest_framework.permissions.AllowAny',),
+    'DEFAULT_AUTHENTICATION_CLASSES':(
+        'rest_framework.authentication.BasicAuthentication',   
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',     
+       
+    )
+}
+""" 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',  # replace with your React frontend domain
+]
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOWED_METHODS = [    'GET',    'POST',    'PUT',    'DELETE',    'OPTIONS']
+CORS_ALLOWED_HEADERS = [
+    # ...
+    'Content-Type',
+    # ...
+] """
+
 
 ROOT_URLCONF = 'ai_based_evm_backend.urls'
 
@@ -130,3 +154,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'

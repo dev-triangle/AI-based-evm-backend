@@ -8,7 +8,12 @@ from keras.layers import Dense
 import numpy as np
 import keras.utils as image
 import time
-TrainingImagePath = 'ImagesAttendance/image_training'
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TrainingImagePath = os.path.join(BASE_DIR, 'ImagesAttendance', 'image_training')
+""" TrainingImagePath = './ImagesAttendance/image_training'
+ """
 train_datagen = ImageDataGenerator(
     shear_range=0.1,
     zoom_range=0.1,
@@ -61,7 +66,9 @@ classifier.fit(training_set,
                validation_steps=len(test_set))
 entdtime=time.time()
 print("####time take",round(entdtime-starttime)/60)
-ImagePath='ImagesAttendance/image_testing/adithya/adithya.jpeg'
+ImagePath=os.path.join(BASE_DIR,'ImagesAttendance','image_testing','adithya','adithya.jpeg')
+""" ImagePath='ImagesAttendance/image_testing/adithya/adithya.jpeg'
+ """
 test_image=image.load_img(ImagePath,target_size=(64, 64))
 test_image=image.img_to_array(test_image)
  
