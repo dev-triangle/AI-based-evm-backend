@@ -8,5 +8,6 @@ router=DefaultRouter()
 router.register('register',RegisterView,basename='register')
 router.register('election',ElectionViewset,basename='election')
 router.register('candidates',CandidateViewset,basename='candidates')
-urlpatterns=[path('',include(router.urls)),path('recognize_face/', recognize_face, name='recognize_face'),
+urlpatterns=[path('',include(router.urls)),
+             path('recognize_face/', recognize_face, name='recognize_face'),
 ]

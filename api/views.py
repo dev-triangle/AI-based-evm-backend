@@ -13,12 +13,12 @@ import json
 def recognize_face(request):
     print(request.POST)
     
-    print(request.body)
+"""  print(request.body)
     image_data = json.loads(request.body).get("image_data")
     image_binary=base64.b64decode(image_data)
-    print(image_binary)
+    print(image_binary) """
 
-    """ ith open('test.jpg','wb') as f:
+""" ith open('test.jpg','wb') as f:
         f.write(image_binary)
     test_image=Image.open('test.jpg').convert('RGB').resize((64,64))
     test_image=np.array(test_image)/255.0
