@@ -5,15 +5,14 @@ from .serializers import (RegisterSerializer,ElectionSerializer,CandidateSeriali
 """ from .AI_model.face_cnn import classifier,resultMap
  """
 import base64
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse
 from PIL import Image
 import numpy as np
 import json
 
 def recognize_face(request):
-    print(request.POST)
-    
-"""  print(request.body)
+      return HttpResponse("Welcome")
+      """  print(request.body)
     image_data = json.loads(request.body).get("image_data")
     image_binary=base64.b64decode(image_data)
     print(image_binary) """
