@@ -70,6 +70,7 @@ ImagePath=os.path.join(BASE_DIR,'ImagesAttendance','image_testing','adithya','ad
 """ ImagePath='ImagesAttendance/image_testing/adithya/adithya.jpeg'
  """
 test_image=image.load_img(ImagePath,target_size=(64, 64))
+print(test_image)
 test_image=image.img_to_array(test_image)
  
 test_image=np.expand_dims(test_image,axis=0)

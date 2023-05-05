@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import (User,Election,Candidate)
+from .models import (User,Election,Candidate,Imagerec)
 from rest_framework.permissions import IsAuthenticated
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -30,4 +30,7 @@ class CandidateSerializer(serializers.ModelSerializer):
         model=Candidate
         fields='__all__'
     
-    
+class ImagerecSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model=Imagerec
+        fields='__all__'   
