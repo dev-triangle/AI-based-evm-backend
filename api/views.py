@@ -3,8 +3,8 @@ from rest_framework import generics,mixins,viewsets,status
 from .models import (User,Election,Candidate,Imagerec)
 from .serializers import (RegisterSerializer,ElectionSerializer,CandidateSerializer,ImagerecSerializer)
 
-""" from .AI_model.face_cnn import classifier,resultMap
- """ 
+from .AI_model.face_cnn import classifier,resultMap
+ 
 import base64
 from django.http import JsonResponse,HttpResponse
 """ from PIL import Image
@@ -17,6 +17,8 @@ import os
 import keras.utils as image
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MEDIA_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'media'))
+
 
 
 """ def recognize_face(request):
@@ -38,27 +40,28 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 @csrf_exempt
 def recognize_face(request):
-    if request.method == 'POST':
-        image_file = request.FILES['image']
+    if request.method == 'GET':
+        """ image_file = request.FILES['image'] """
         # Save the uploaded image file to a temporary directory
-        image_path = os.path.join(BASE_DIR, 'temp', 'hell.jpg')
-        with open(image_path, 'wb') as f:
-            f.write(image_file.read())
+
+        image_path = os.path.join(MEDIA_ROOT, 'covers', 'hi', 'aaamm.jpg')
+        """ with open(image_path, 'wb') as f:
+            f.write(image_file.read()) """
         # Load and preprocess the image
         test_image = image.load_img(image_path, target_size=(64, 64))
         test_image = image.img_to_array(test_image)
         test_image = np.expand_dims(test_image, axis=0)
-        test_image /= 255.0
+        """ test_image /= 255.0 """
         print(test_image)
         print("hello")
         # Predict the class label
-        """ result = classifier.predict(test_image)[0]
-        predicted_class = result_map[np.argmax(result)] """
+        result = classifier.predict(test_image,verbose=0)
+        predicted_class = resultMap[np.argmax(result)]
         # Remove the temporary image file
-        os.remove(image_path)
+        """ os.remove(image_path) """
         # Return the predicted class label as a response
-        """         return HttpResponse(predicted_class)
-        """    
+        return HttpResponse(predicted_class)
+            
     else:
         return render(request, 'recognize_image.html')
 
