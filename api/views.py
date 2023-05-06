@@ -1,9 +1,12 @@
 from django.shortcuts import render
 from rest_framework import generics,mixins,viewsets,status
 from .models import (User,Election,Candidate,Imagerec)
-from .serializers import (RegisterSerializer,ElectionSerializer,CandidateSerializer,ImagerecSerializer)
-
+from .serializers import (RegisterSerializer,ElectionSerializer,CandidateSerializer,ImagerecSerializer,UserSerializer)
+from rest_framework_simplejwt.tokens import RefreshToken,AccessToken
 # from .AI_model.face_cnn import classifier,resultMap
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly,AllowAny
+from rest_framework.response import Response
  
 import base64
 from django.http import JsonResponse,HttpResponse
@@ -61,18 +64,21 @@ def test_face(request):
 def recognize_face(request):
   image_path1=os.path.join(BASE_DIR,"AI_model","ImagesAttendance","image_testing","adithya","adithya.jpeg")
   image_path2=os.path.join(BASE_DIR,"AI_model","ImagesAttendance","image_testing","sanosh","sanosh.jpeg")
-
+  image_path3=os.path.join(BASE_DIR,"AI_model","ImagesAttendance","image_testing","arjun","arjun.jpeg")
   ema_img=face_recognition.load_image_file(image_path1)
   ema_encoding=face_recognition.face_encodings(ema_img)[0]
 
   bezos_img=face_recognition.load_image_file(image_path2)
   bezos_encoding=face_recognition.face_encodings(bezos_img)[0]
+
+  arjun_img=face_recognition.load_image_file(image_path3)
+  arjun_encoding=face_recognition.face_encodings(arjun_img)[0]
   known_face_encoding=[
-    ema_encoding,bezos_encoding
+    ema_encoding,bezos_encoding,arjun_encoding
   ]
 
   known_face_names=[
-    "Adithya","sanosh"
+    "Adithya","sanosh","Arjun"
   ]
   clf=svm.SVC()
   clf.fit(known_face_encoding,known_face_names)
@@ -86,14 +92,14 @@ def recognize_face(request):
   frame=cv2.imread(image_path)
   small_frame = cv2.resize(frame,(0,0),fx=0.25,fy=0.25)
   rgb_small_frame = small_frame[:,:,::-1]
-  name=""
+  name=[]
   if s:
       face_locations=face_recognition.face_locations(small_frame)
       face_encodings=face_recognition.face_encodings(small_frame,face_locations)
       face_names=[]
       for face_encoding in face_encodings:
         name = clf.predict([face_encoding])
-        print(name[0])
+        print(name)
   return JsonResponse({'voter_name': name[0]})
 # def recognize_face(request):
 #   image_path1=os.path.join(BASE_DIR,"AI_model","ImagesAttendance","image_testing","adithya","adithya.jpeg")
@@ -235,3 +241,19 @@ class ImagerecViewset(viewsets.ModelViewSet):
         title=request.data['title']
         Imagerec.objects.create(title=title,cover=cover)
         return HttpResponse({'message': 'image created'},status=200)
+
+class BlacklistTokenView(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self,request):
+        try:
+            refresh_token=request.data["refresh_token"]
+            token=RefreshToken(refresh_token)
+            token.blacklist()
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class LoggedInUserView(APIView):
+    permission_classes=[IsAuthenticated]
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
