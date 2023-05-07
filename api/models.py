@@ -4,47 +4,40 @@ from email.policy import default
 
 # Create your models here.
 class UserManager(BaseUserManager):
-    def create_user(self,email,username=None,password=None,voters_id=None,aadhaar_number=None,user_img=None,**extra_fields):
-        
+    def create_user(self,username,email,password=None):
+        if username is None:
+            raise TypeError("Users should have a username")
 
         if email is None:
             raise TypeError("Users should have a email")
-        if password is None:
-            raise TypeError("Users should have a password")
-        if aadhaar_number is None:
-            raise TypeError("Users should have a adhar number")
-        if user_img is None:
-            raise TypeError("Users should have a user_img")
 
-        
-
-        user=self.model(email=self.normalize_email(email),username=username,voters_id=voters_id,aadhaar_number=aadhaar_number,user_img=user_img,**extra_fields)
+        user=self.model(username=username,email=self.normalize_email(email))
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        return self.create_user(email, password, **extra_fields)
+    def create_superuser(self,username,email,password=None):
+        if password is None:
+            raise TypeError("Password should not be none")
         
-    
-class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(max_length=255, unique=True,db_index=True)
-    username=models.CharField(max_length=255,unique=True,db_index=True,null=True)
-    voters_id = models.CharField(max_length=20,null=True)
-    aadhaar_number = models.CharField(max_length=12,null=True)
-    user_img = models.ImageField(upload_to='user_photos', blank=True,null=True)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+        user=self.create_user(username,email,password)
+        user.is_superuser=True
+        user.is_staff=True
+        user.save(using=self._db)
+        return user
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['voters_id', 'aadhaar_number']
+class User(AbstractBaseUser,PermissionsMixin):
+    username=models.CharField(max_length=255,unique=True,db_index=True)
+    email=models.EmailField(max_length=255,unique=True,db_index=True)
+    is_verified=models.BooleanField(default=False)
+    is_active=models.BooleanField(default=True)
+    is_staff=models.BooleanField(default=False)
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now_add=True)
+    USERNAME_FIELD='email'
+    REQUIRED_FIELDS=['username']
 
-    objects = UserManager()
-
+    objects=UserManager()
     def __str__(self):
         return self.username
 
@@ -71,3 +64,16 @@ def upload_path(instance,filename):
 class Imagerec(models.Model):
     title=models.CharField(max_length=32,blank=False)
     cover=models.ImageField(blank=True,null=True,upload_to=upload_path)
+
+class Vote(models.Model):
+    election_foreign=models.ForeignKey(Election,on_delete=models.CASCADE,null=True,blank=True)
+    candidate_foreign=models.ForeignKey(Candidate,on_delete=models.CASCADE,null=True,blank=True)
+    def __str__(self):
+        return self.election_foreign
+
+# class Userdetail(models.Model):
+#     email = models.EmailField(max_length=255, unique=True)
+#     username=models.CharField(max_length=255,unique=True,null=True)
+#     voters_id = models.CharField(max_length=20,null=True)
+#     aadhaar_number = models.CharField(max_length=12,null=True)
+#     user_img = models.ImageField(blank=True,null=True)

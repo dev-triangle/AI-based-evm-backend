@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics,mixins,viewsets,status
-from .models import (User,Election,Candidate,Imagerec)
-from .serializers import (RegisterSerializer,ElectionSerializer,CandidateSerializer,ImagerecSerializer,UserSerializer)
+from .models import (User,Election,Candidate,Imagerec,Vote)
+from .serializers import (RegisterSerializer,ElectionSerializer,CandidateSerializer,ImagerecSerializer,UserSerializer,VoteSerializer)
 from rest_framework_simplejwt.tokens import RefreshToken,AccessToken
 # from .AI_model.face_cnn import classifier,resultMap
 from rest_framework.views import APIView
@@ -61,46 +61,98 @@ def test_face(request):
     return JsonResponse({'name':predicted_name})  """   
 
 @csrf_exempt
+
 def recognize_face(request):
-  image_path1=os.path.join(BASE_DIR,"AI_model","ImagesAttendance","image_testing","adithya","adithya.jpeg")
-  image_path2=os.path.join(BASE_DIR,"AI_model","ImagesAttendance","image_testing","sanosh","sanosh.jpeg")
-  image_path3=os.path.join(BASE_DIR,"AI_model","ImagesAttendance","image_testing","arjun","arjun.jpeg")
-  ema_img=face_recognition.load_image_file(image_path1)
-  ema_encoding=face_recognition.face_encodings(ema_img)[0]
+    # Load known face encodings and names from image files
+    image_path1 = os.path.join(BASE_DIR, "AI_model", "ImagesAttendance", "image_testing", "adithya", "adithya.jpeg")
+    image_path2 = os.path.join(BASE_DIR, "AI_model", "ImagesAttendance", "image_testing", "sanosh", "sanosh.jpeg")
+    image_path3 = os.path.join(BASE_DIR, "AI_model", "ImagesAttendance", "image_testing", "arjun", "arjun.jpeg")
+    ema_img = face_recognition.load_image_file(image_path1)
+    ema_encoding = face_recognition.face_encodings(ema_img)[0]
+    bezos_img = face_recognition.load_image_file(image_path2)
+    bezos_encoding = face_recognition.face_encodings(bezos_img)[0]
+    arjun_img = face_recognition.load_image_file(image_path3)
+    arjun_encoding = face_recognition.face_encodings(arjun_img)[0]
+    known_face_encoding = [
+        ema_encoding, bezos_encoding, arjun_encoding
+    ]
+    known_face_names = [
+        "Adithya", "sanosh", "Arjun"
+    ]
+    
+    # Load list of valid voters from a file
+    valid_voters_path = os.path.join(BASE_DIR, "valid_voters.json")
+    with open(valid_voters_path, "r") as f:
+        valid_voters = json.load(f)
+    
+    # Train classifier on known face encodings and names
+    clf = svm.SVC()
+    clf.fit(known_face_encoding, known_face_names)
+    
+    # Detect faces in the image and recognize voters
+    face_locations = []
+    face_encodings = []
+    face_names = []
+    s = True
+    image_path = os.path.join(MEDIA_ROOT, "covers", "image.jpeg")
+    frame = cv2.imread(image_path)
+    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    rgb_small_frame = small_frame[:, :, ::-1]
+    for voter in valid_voters:
+        if voter["voted"] == False:
+            face_locations = face_recognition.face_locations(small_frame)
+            face_encodings = face_recognition.face_encodings(small_frame, face_locations)
+            face_names = []
+            for face_encoding in face_encodings:
+                name = clf.predict([face_encoding])[0]
+                if name == voter["name"]:
+                    voter["voted"] = True
+                    with open(valid_voters_path, "w") as f:
+                        json.dump(valid_voters, f)
+                    return JsonResponse({'voter_name': name})
+    
+    # If no valid voters are found, return an error message
+    return JsonResponse({'error': 'No valid voters found.'})
+# def recognize_face(request):
+#   image_path1=os.path.join(BASE_DIR,"AI_model","ImagesAttendance","image_testing","adithya","adithya.jpeg")
+#   image_path2=os.path.join(BASE_DIR,"AI_model","ImagesAttendance","image_testing","sanosh","sanosh.jpeg")
+#   image_path3=os.path.join(BASE_DIR,"AI_model","ImagesAttendance","image_testing","arjun","arjun.jpeg")
+#   ema_img=face_recognition.load_image_file(image_path1)
+#   ema_encoding=face_recognition.face_encodings(ema_img)[0]
 
-  bezos_img=face_recognition.load_image_file(image_path2)
-  bezos_encoding=face_recognition.face_encodings(bezos_img)[0]
+#   bezos_img=face_recognition.load_image_file(image_path2)
+#   bezos_encoding=face_recognition.face_encodings(bezos_img)[0]
 
-  arjun_img=face_recognition.load_image_file(image_path3)
-  arjun_encoding=face_recognition.face_encodings(arjun_img)[0]
-  known_face_encoding=[
-    ema_encoding,bezos_encoding,arjun_encoding
-  ]
+#   arjun_img=face_recognition.load_image_file(image_path3)
+#   arjun_encoding=face_recognition.face_encodings(arjun_img)[0]
+#   known_face_encoding=[
+#     ema_encoding,bezos_encoding,arjun_encoding
+#   ]
 
-  known_face_names=[
-    "Adithya","sanosh","Arjun"
-  ]
-  clf=svm.SVC()
-  clf.fit(known_face_encoding,known_face_names)
-  valid_voters=known_face_names.copy()
+#   known_face_names=[
+#     "Adithya","sanosh","Arjun"
+#   ]
+#   clf=svm.SVC()
+#   clf.fit(known_face_encoding,known_face_names)
+#   valid_voters=known_face_names.copy()
 
-  face_locations = []
-  face_encodings = []
-  face_names = []
-  s =True
-  image_path=os.path.join(MEDIA_ROOT,"covers","image.jpeg")
-  frame=cv2.imread(image_path)
-  small_frame = cv2.resize(frame,(0,0),fx=0.25,fy=0.25)
-  rgb_small_frame = small_frame[:,:,::-1]
-  name=[]
-  if s:
-      face_locations=face_recognition.face_locations(small_frame)
-      face_encodings=face_recognition.face_encodings(small_frame,face_locations)
-      face_names=[]
-      for face_encoding in face_encodings:
-        name = clf.predict([face_encoding])
-        print(name)
-  return JsonResponse({'voter_name': name[0]})
+#   face_locations = []
+#   face_encodings = []
+#   face_names = []
+#   s =True
+#   image_path=os.path.join(MEDIA_ROOT,"covers","image.jpeg")
+#   frame=cv2.imread(image_path)
+#   small_frame = cv2.resize(frame,(0,0),fx=0.25,fy=0.25)
+#   rgb_small_frame = small_frame[:,:,::-1]
+#   name=[]
+#   if s:
+#       face_locations=face_recognition.face_locations(small_frame)
+#       face_encodings=face_recognition.face_encodings(small_frame,face_locations)
+#       face_names=[]
+#       for face_encoding in face_encodings:
+#         name = clf.predict([face_encoding])
+#         print(name)
+#   return JsonResponse({'voter_name': name[0]})
 # def recognize_face(request):
 #   image_path1=os.path.join(BASE_DIR,"AI_model","ImagesAttendance","image_testing","adithya","adithya.jpeg")
 #   image_path2=os.path.join(BASE_DIR,"AI_model","ImagesAttendance","image_testing","sanosh","sanosh.jpeg")
@@ -228,9 +280,17 @@ class ElectionViewset(viewsets.GenericViewSet,mixins.ListModelMixin,mixins.Retri
     queryset=Election.objects.all()
     serializer_class=ElectionSerializer
 
+class UserViewset(viewsets.GenericViewSet,mixins.RetrieveModelMixin,mixins.ListModelMixin):
+    serializer_class=UserSerializer
+    queryset=User.objects.all()
+
 class CandidateViewset(viewsets.GenericViewSet,mixins.ListModelMixin,mixins.RetrieveModelMixin):
     queryset=Candidate.objects.all()
     serializer_class=CandidateSerializer
+
+class VoteViewset(viewsets.GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin,mixins.RetrieveModelMixin):
+    queryset=Vote.objects.all()
+    serializer_class=VoteSerializer
     
 class ImagerecViewset(viewsets.ModelViewSet):
     queryset=Imagerec.objects.all()
