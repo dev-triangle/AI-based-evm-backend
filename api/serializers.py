@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import (User,Election,Candidate,Imagerec,Vote)
+from .models import (User,Election,Candidate,Imagerec,Vote,UserDetail)
 from rest_framework.permissions import IsAuthenticated
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -44,3 +44,9 @@ class VoteSerializer(serializers.ModelSerializer):
     class Meta:
         model= Vote
         fields = '__all__'
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    user_image=serializers.ImageField(max_length=None,allow_empty_file=False,use_url=True,required=False)
+    class Meta:
+        model=UserDetail
+        fields='__all__'        

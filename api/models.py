@@ -70,6 +70,17 @@ class Vote(models.Model):
     candidate_foreign=models.ForeignKey(Candidate,on_delete=models.CASCADE,null=True,blank=True)
     def __str__(self):
         return self.election_foreign
+    
+class UserDetail(models.Model):
+    user_foreign=models.ForeignKey(User,on_delete=models.CASCADE)
+    actual_name=models.CharField(max_length=200,blank=True,null=True)
+    mobile_number=models.CharField(max_length=200,blank=True,null=True)
+    voters_id=models.CharField(max_length=100,blank=True,null=True)
+    adhar_number=models.CharField(max_length=100,blank=True,null=True)
+    pan_number=models.CharField(max_length=100,blank=True,null=True)
+    user_image=models.ImageField(upload_to='user_images',blank=True,null=True)
+    def __str__(self):
+        return(self.actual_name)    
 
 # class Userdetail(models.Model):
 #     email = models.EmailField(max_length=255, unique=True)

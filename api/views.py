@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics,mixins,viewsets,status
-from .models import (User,Election,Candidate,Imagerec,Vote)
-from .serializers import (RegisterSerializer,ElectionSerializer,CandidateSerializer,ImagerecSerializer,UserSerializer,VoteSerializer)
+from .models import (User,Election,Candidate,Imagerec,Vote,UserDetail)
+from .serializers import (RegisterSerializer,UserDetailSerializer,ElectionSerializer,CandidateSerializer,ImagerecSerializer,UserSerializer,VoteSerializer)
 from rest_framework_simplejwt.tokens import RefreshToken,AccessToken
 # from .AI_model.face_cnn import classifier,resultMap
 from rest_framework.views import APIView
@@ -295,6 +295,10 @@ class VoteViewset(viewsets.GenericViewSet,mixins.ListModelMixin,mixins.CreateMod
 class ImagerecViewset(viewsets.ModelViewSet):
     queryset=Imagerec.objects.all()
     serializer_class=ImagerecSerializer
+
+class UserDetailViewset(viewsets.GenericViewSet,mixins.DestroyModelMixin,mixins.UpdateModelMixin,mixins.CreateModelMixin,mixins.RetrieveModelMixin,mixins.ListModelMixin):
+    serializer_class=UserDetailSerializer
+    queryset=UserDetail.objects.all()    
     
     def post(self,request,*args,**kwargs):
         cover=request.data['cover']
