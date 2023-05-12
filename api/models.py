@@ -56,6 +56,8 @@ class Candidate(models.Model):
     candidate_name=models.CharField(max_length=100)
     party=models.CharField(max_length=50)
     election=models.ForeignKey(Election,on_delete=models.CASCADE,null=True,blank=True)
+    candidate_image=models.ImageField(blank=True,null=True)
+
     def __str__(self):
         return self.candidate_name
 

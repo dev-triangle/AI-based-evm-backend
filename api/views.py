@@ -276,7 +276,7 @@ class RegisterView(viewsets.GenericViewSet,mixins.CreateModelMixin,mixins.Retrie
     serializer_class=RegisterSerializer
     queryset=User.objects.all()
 
-class ElectionViewset(viewsets.GenericViewSet,mixins.ListModelMixin,mixins.RetrieveModelMixin):
+class ElectionViewset(viewsets.GenericViewSet,mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.DestroyModelMixin):
     queryset=Election.objects.all()
     serializer_class=ElectionSerializer
 
@@ -284,11 +284,11 @@ class UserViewset(viewsets.GenericViewSet,mixins.RetrieveModelMixin,mixins.ListM
     serializer_class=UserSerializer
     queryset=User.objects.all()
 
-class CandidateViewset(viewsets.GenericViewSet,mixins.ListModelMixin,mixins.RetrieveModelMixin):
+class CandidateViewset(viewsets.GenericViewSet,mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.DestroyModelMixin):
     queryset=Candidate.objects.all()
     serializer_class=CandidateSerializer
 
-class VoteViewset(viewsets.GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin,mixins.RetrieveModelMixin):
+class VoteViewset(viewsets.GenericViewSet,mixins.ListModelMixin,mixins.CreateModelMixin,mixins.RetrieveModelMixin,mixins.DestroyModelMixin):
     queryset=Vote.objects.all()
     serializer_class=VoteSerializer
     
