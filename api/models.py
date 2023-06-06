@@ -57,7 +57,7 @@ class Candidate(models.Model):
     party=models.CharField(max_length=50)
     election=models.ForeignKey(Election,on_delete=models.CASCADE,null=True,blank=True)
     candidate_image=models.ImageField(blank=True,null=True)
-
+    vote_count= models.IntegerField(default=0)
     def __str__(self):
         return self.candidate_name
 
@@ -71,7 +71,8 @@ class Vote(models.Model):
     election_foreign=models.ForeignKey(Election,on_delete=models.CASCADE,null=True,blank=True)
     candidate_foreign=models.ForeignKey(Candidate,on_delete=models.CASCADE,null=True,blank=True)
     def __str__(self):
-        return self.election_foreign
+        return f"Vote - {self.candidate_foreign.candidate_name}"
+    
     
 class UserDetail(models.Model):
     user_foreign=models.ForeignKey(User,on_delete=models.CASCADE)

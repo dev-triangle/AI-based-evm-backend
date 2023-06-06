@@ -7,7 +7,8 @@ from rest_framework_simplejwt.tokens import RefreshToken,AccessToken
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly,AllowAny
 from rest_framework.response import Response
- 
+from django.shortcuts import get_object_or_404
+
 import base64
 from django.http import JsonResponse,HttpResponse
 """ from PIL import Image
@@ -271,6 +272,22 @@ def recognize_face(request):
 
 
 # Create your views here.
+@csrf_exempt
+def submit_vote(request):
+    decoded_body = request.body.decode('utf-8')
+
+# Parse the JSON string
+    data = json.loads(decoded_body)
+
+# Extract the values
+    candidate_id = data["candidate_id"]
+    election_id = data["election_id"]
+    print(request.body)
+    print(candidate_id,type(candidate_id))
+    candidate = get_object_or_404(Candidate, id=candidate_id)
+    candidate.vote_count+=1
+    candidate.save()
+    return HttpResponse("vote submited")
 
 class RegisterView(viewsets.GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveModelMixin,mixins.ListModelMixin):
     serializer_class=RegisterSerializer
