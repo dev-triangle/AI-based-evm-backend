@@ -24,7 +24,9 @@ import csv
 from datetime import datetime
 import cv2
 import base64
-from sklearn import svm
+# from sklearn import svm
+from sklearn.neighbors import KNeighborsClassifier
+
 # import keras.utils as image
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -67,18 +69,22 @@ def recognize_face(request):
     # Load known face encodings and names from image files
     image_path1 = os.path.join(BASE_DIR, "AI_model", "ImagesAttendance", "image_testing", "adithya", "adithya.jpeg")
     image_path2 = os.path.join(BASE_DIR, "AI_model", "ImagesAttendance", "image_testing", "sanosh", "sanosh.jpeg")
-    image_path3 = os.path.join(BASE_DIR, "AI_model", "ImagesAttendance", "image_testing", "arjun", "arjun.jpeg")
+    # image_path3 = os.path.join(BASE_DIR, "AI_model", "ImagesAttendance", "image_testing", "arjun", "arjun.jpeg")
+    image_path4 = os.path.join(BASE_DIR, "AI_model", "ImagesAttendance", "image_testing", "nandu", "nandu.jpeg")
     ema_img = face_recognition.load_image_file(image_path1)
     ema_encoding = face_recognition.face_encodings(ema_img)[0]
     bezos_img = face_recognition.load_image_file(image_path2)
     bezos_encoding = face_recognition.face_encodings(bezos_img)[0]
-    arjun_img = face_recognition.load_image_file(image_path3)
-    arjun_encoding = face_recognition.face_encodings(arjun_img)[0]
+    # arjun_img = face_recognition.load_image_file(image_path3)
+    # arjun_encoding = face_recognition.face_encodings(arjun_img)[0]
+    nandu_img = face_recognition.load_image_file(image_path4)
+    nandu_encoding = face_recognition.face_encodings(nandu_img)[0]
+    
     known_face_encoding = [
-        ema_encoding, bezos_encoding, arjun_encoding
+        ema_encoding, bezos_encoding , nandu_encoding
     ]
     known_face_names = [
-        "Adithya", "sanosh", "Arjun"
+        "Adithya", "sanosh","Nandu"
     ]
     
     # Load list of valid voters from a file
@@ -86,8 +92,11 @@ def recognize_face(request):
     with open(valid_voters_path, "r") as f:
         valid_voters = json.load(f)
     
+    # # Train classifier on known face encodings and names
+    # clf = svm.SVC()
+    # clf.fit(known_face_encoding, known_face_names)
     # Train classifier on known face encodings and names
-    clf = svm.SVC()
+    clf = KNeighborsClassifier(n_neighbors=3)
     clf.fit(known_face_encoding, known_face_names)
     
     # Detect faces in the image and recognize voters
