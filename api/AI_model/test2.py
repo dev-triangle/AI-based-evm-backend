@@ -1,9 +1,9 @@
 import face_recognition
-import cv2
 import numpy as np
 import csv
 import os
 from datetime import datetime
+import cv2
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MEDIA_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'media'))
 
@@ -12,31 +12,31 @@ MEDIA_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..',
 
 
 #load image
-ema_img=face_recognition.load_image_file('./sample_images/ema.jpeg')
+ema_img=face_recognition.load_image_file('./ImagesAttendance/image_testing/adithya/adithya.jpeg')
 ema_encoding=face_recognition.face_encodings(ema_img)[0]
 
-bezos_img=face_recognition.load_image_file('./sample_images/jeffbezos.jpg')
+bezos_img=face_recognition.load_image_file('./ImagesAttendance/image_testing/sanosh/sanosh.jpeg')
 bezos_encoding=face_recognition.face_encodings(bezos_img)[0]
 
-kristen_img=face_recognition.load_image_file('./sample_images/kristen.jpeg')
-kristen_encoding=face_recognition.face_encodings(kristen_img)[0]
+# kristen_img=face_recognition.load_image_file('./sample_images/kristen.jpeg')
+# kristen_encoding=face_recognition.face_encodings(kristen_img)[0]
 
-# elon_img=face_recognition.load_image_file('./sample_images/')
-hari_img=face_recognition.load_image_file('./sample_images/hari.jpeg')
-hari_encoding=face_recognition.face_encodings(hari_img)[0]
+# # elon_img=face_recognition.load_image_file('./sample_images/')
+# hari_img=face_recognition.load_image_file('./sample_images/hari.jpeg')
+# hari_encoding=face_recognition.face_encodings(hari_img)[0]
 
-nandu_img=face_recognition.load_image_file('./sample_images/nandv.jpeg')
-nandu_encoding=face_recognition.face_encodings(nandu_img)[0]
+# nandu_img=face_recognition.load_image_file('./sample_images/nandv.jpeg')
+# nandu_encoding=face_recognition.face_encodings(nandu_img)[0]
 
-alen_img=face_recognition.load_image_file('./sample_images/alen.jpeg')
-alen_encoding=face_recognition.face_encodings(alen_img)[0]
+# alen_img=face_recognition.load_image_file('./sample_images/alen.jpeg')
+# alen_encoding=face_recognition.face_encodings(alen_img)[0]
 
 known_face_encoding=[
-    ema_encoding,bezos_encoding,kristen_encoding,hari_encoding,nandu_encoding,alen_encoding
+    ema_encoding,bezos_encoding
 ]
 
 known_face_names=[
-    "Ema watson","Jeff Bezos","Kristen Stewart","Hari Kri","Nandu B","Alen"
+    "Adithya","sanosh"
 ]
 
 valid_voters=known_face_names.copy()
@@ -52,7 +52,7 @@ current_date = now.strftime("%Y-%m-%d")
 f = open(current_date+'.csv','w+',newline = '')
 cswriter=csv.writer(f)
 
-image_path=os.path.join(MEDIA_ROOT,"covers","hi","aaamm.jpg")
+image_path=os.path.join(MEDIA_ROOT,"covers","hi","aam.jpeg")
 frame=cv2.imread(image_path)
 small_frame = cv2.resize(frame,(0,0),fx=0.25,fy=0.25)
 rgb_small_frame = small_frame[:,:,::-1]
@@ -74,12 +74,9 @@ if s:
             if name in valid_voters:
                 valid_voters.remove(name)
                 print(valid_voters)
+                print(name)
                 current_time=now.strftime("%H-%M-%S")
                 cswriter.writerow([name,current_time])
-
-
-    
- 
 
 f.close()
 print("c0de completed")
